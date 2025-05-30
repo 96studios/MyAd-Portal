@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advertiser Portal</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .top-container {
+            width: 100%;
+            background: white;
+            padding: 60px 20px 40px;
+            text-align: center;
+        }
+
+        .content-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        p {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            flex: 1;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: #3498db;
+            border: 1px solid #3498db !important;
+        }
+
+        .btn-secondary:hover {
+            background-color: #f0f7fc;
+        }
+
+        /* Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        label.required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .ad-prefix {
+            display: flex;
+            align-items: center;
+        }
+
+        .ad-prefix span {
+            padding: 12px 15px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 6px 0 0 6px;
+            border-right: none;
+        }
+
+        .ad-prefix input {
+            border-radius: 0 6px 6px 0;
+        }
+
+        .terms-container {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .terms-container ul {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+
+        .terms-container li {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input {
+            width: auto;
+            margin-right: 10px;
+            margin-top: 3px;
+        }
+
+        .checkbox-group label {
+            font-weight: normal;
+            margin-bottom: 0;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .error {
+            background-color: #fdecea;
+            color: #d32f2f;
+            border: 1px solid #ef9a9a;
+        }
+
+        .success {
+            background-color: #e8f5e9;
+            color: #388e3c;
+            border: 1px solid #a5d6a7;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .top-container {
+                padding: 30px 15px;
+            }
+        }
+
+
+        .form-group.invalid input,
+        .form-group.invalid select {
+            border-color: #e74c3c;
+            background-color: #fdecea;
+        }
+        
+        .error-text {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-container">
+        <div class="content-wrapper" id="mainContent">
+            <h1>Advertiser Portal</h1>
+            <p>Register as an advertiser or access your existing advertiser profile.</p>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" id="registerBtn">Register as Advertiser</button>
+                <button class="btn btn-secondary" id="existingBtn">Existing Advertiser</button>
+            </div>
+            
+            <div id="adIdSection" style="display: none;">
+                <div class="form-group">
+                    <label for="adId">Advertiser ID</label>
+                    <div class="ad-prefix">
+                        <span>ad-</span>
+                        <input type="text" id="adId" placeholder="Enter your ID code" maxlength="5">
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="validateAdId()">Continue</button>
+                
+                <div id="error" class="message error"></div>
+                <div id="success" class="message success">Redirecting to your advertiser profile...</div>
+            </div>
+            
+             <div id="registrationForm" style="display: none;">
+        <form id="advertiserForm" novalidate>
+            <div class="form-grid">
+                <div class="form-group" id="fullNameGroup">
+                    <label for="fullName" class="required">Full Name</label>
+                    <input type="text" id="fullName">
+                    <div class="error-text" id="fullNameError">Please enter your full name (letters only, 2-30 characters)</div>
+                </div>
+                <div class="form-group" id="surnameGroup">
+                    <label for="surname" class="required">Surname</label>
+                    <input type="text" id="surname">
+                    <div class="error-text" id="surnameError">Please enter your surname (letters only, 2-30 characters)</div>
+                </div>
+                <div class="form-group" id="provinceGroup">
+                    <label for="province" class="required">Province</label>
+                    <select id="province">
+                        <option value="">Select Province</option>
+                        <option value="Eastern Cape">Eastern Cape</option>
+                        <option value="Free State">Free State</option>
+                        <option value="Gauteng">Gauteng</option>
+                        <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+                        <option value="Limpopo">Limpopo</option>
+                        <option value="Mpumalanga">Mpumalanga</option>
+                        <option value="North West">North West</option>
+                        <option value="Northern Cape">Northern Cape</option>
+                        <option value="Western Cape">Western Cape</option>
+                    </select>
+                    <div class="error-text" id="provinceError">Please select your province</div>
+                </div>
+                <div class="form-group" id="cityGroup">
+                    <label for="city" class="required">City</label>
+                    <input type="text" id="city">
+                    <div class="error-text" id="cityError">Please enter your city (2-50 characters)</div>
+                </div>
+                <div class="form-group full-width" id="areaGroup">
+                    <label for="area" class="required">Area/Suburb</label>
+                    <input type="text" id="area">
+                    <div class="error-text" id="areaError">Please enter your area/suburb (2-50 characters)</div>
+                </div>
+            </div>
+                    
+                    <div class="terms-container">
+                        <h3>Terms & Conditions</h3>
+                        <ul>
+                            <li>You must be a South African citizen or legally authorized to work in South Africa</li>
+                            <li>First-time new customer referrals: 30% of total payment</li>
+                            <li>Repeat new customer referrals: 40% of total payment</li>
+                            <li>We reserve the right to terminate any advertiser account engaged in fraudulent activity or policy violations</li>
+                            <li>All payments will be processed within 5 business days after customer payment verification</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="agreeTerms" required>
+                        <label for="agreeTerms" class="required">By submitting this form you agree to our T&Cs</label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Submit Registration</button>
+                    <button type="button" class="btn btn-secondary" onclick="backToMain()">Back</button>
+                </form>
+                
+                <div id="formError" class="message error" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Advertiser database
+        const advertiserDatabase = {
+            "A1B2C": "https://",
+            "J7K8L": ""
+        };
+
+        // DOM Elements
+        const registerBtn = document.getElementById('registerBtn');
+        const existingBtn = document.getElementById('existingBtn');
+        const adIdSection = document.getElementById('adIdSection');
+        const registrationForm = document.getElementById('registrationForm');
+        const mainContent = document.getElementById('mainContent');
+        const advertiserForm = document.getElementById('advertiserForm');
+        const formError = document.getElementById('formError');
+
+        // Event Listeners
+        registerBtn.addEventListener('click', showRegistrationForm);
+        existingBtn.addEventListener('click', showExistingAdvertiser);
+
+        // Ad ID validation
+        function validateAdId() {
+            const adId = "ad-" + document.getElementById('adId').value.trim().toUpperCase();
+            const errorElement = document.getElementById('error');
+            const successElement = document.getElementById('success');
+            
+            // Hide messages
+            errorElement.style.display = 'none';
+            successElement.style.display = 'none';
+            
+            // Validate format (5 alphanumeric characters)
+            const idPattern = /^ad-[A-Z0-9]{5}$/;
+            
+            if (!idPattern.test(adId)) {
+                errorElement.textContent = "Invalid format. Please enter 5 alphanumeric characters after 'ad-'.";
+                errorElement.style.display = 'block';
+                return;
+            }
+            
+            // Check if advertiser ID exists
+            if (advertiserDatabase.hasOwnProperty(adId.substring(3))) {
+                successElement.style.display = 'block';
+                // Redirect after a short delay to show the success message
+                setTimeout(() => {
+                    window.location.href = advertiserDatabase[adId.substring(3)];
+                }, 1000);
+            } else {
+                errorElement.textContent = "Advertiser ID not found. Please check your ID and try again.";
+                errorElement.style.display = 'block';
+            }
+        }
+        
+        // Form validation and submission
+        advertiserForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            formError.style.display = 'none';
+            
+            // Validate form
+            if (!validateForm()) {
+                return;
+            }
+            
+            // Prepare WhatsApp message
+            const fullName = document.getElementById('fullName').value;
+            const surname = document.getElementById('surname').value;
+            const province = document.getElementById('province').value;
+            const city = document.getElementById('city').value;
+            const area = document.getElementById('area').value;
+            
+            const message = `New Advertiser Registration:\n\n` +
+                           `Name: ${fullName} ${surname}\n` +
+                           `Location: ${area}, ${city}, ${province}\n\n` +
+                           `Please process this registration.`;
+            
+            // Encode for WhatsApp URL
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/27817925033?text=${encodedMessage}`;
+            
+            // Open WhatsApp
+            window.open(whatsappUrl, '_blank');
+        });
+        
+        function validateForm() {
+            const requiredFields = [
+                'fullName', 'surname', 'province', 'city', 'area'
+            ];
+            
+            for (const fieldId of requiredFields) {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    formError.textContent = `Please fill in all required fields. ${field.labels[0].textContent} is missing.`;
+                    formError.style.display = 'block';
+                    field.focus();
+                    return false;
+                }
+            }
+            
+            if (!document.getElementById('agreeTerms').checked) {
+                formError.textContent = "You must agree to the Terms & Conditions";
+                formError.style.display = 'block';
+                return false;
+            }
+            
+            return true;
+        }
+        
+        function showRegistrationForm() {
+            mainContent.querySelector('p').style.display = 'none';
+            document.querySelector('.button-group').style.display = 'none';
+            registrationForm.style.display = 'block';
+        }
+        
+        function showExistingAdvertiser() {
+            mainContent.querySelector('p').style.display = 'none';
+            document.querySelector('.button-group').style.display = 'none';
+            adIdSection.style.display = 'block';
+        }
+        
+        function backToMain() {
+            mainContent.querySelector('p').style.display = 'block';
+            document.querySelector('.button-group').style.display = 'flex';
+            registrationForm.style.display = 'none';
+            adIdSection.style.display = 'none';
+        }
+    </script>
+
+    <script>
+        // Custom validation functions
+        function validateName(name) {
+            return /^[A-Za-z\s]{2,30}$/.test(name.trim());
+        }
+        
+        function validateLocation(location) {
+            return /^[A-Za-z\s\-']{2,50}$/.test(location.trim());
+        }
+        
+        function validateProvince(province) {
+            return province !== "";
+        }
+        
+        // Enhanced form validation
+        function validateForm() {
+            let isValid = true;
+            const fullName = document.getElementById('fullName').value;
+            const surname = document.getElementById('surname').value;
+            const province = document.getElementById('province').value;
+            const city = document.getElementById('city').value;
+            const area = document.getElementById('area').value;
+            
+            // Reset all error states
+            document.querySelectorAll('.form-group').forEach(group => {
+                group.classList.remove('invalid');
+            });
+            document.querySelectorAll('.error-text').forEach(error => {
+                error.style.display = 'none';
+            });
+            
+            // Validate each field
+            if (!validateName(fullName)) {
+                document.getElementById('fullNameGroup').classList.add('invalid');
+                document.getElementById('fullNameError').style.display = 'block';
+                document.getElementById('fullName').focus();
+                isValid = false;
+            }
+            
+            if (!validateName(surname)) {
+                document.getElementById('surnameGroup').classList.add('invalid');
+                document.getElementById('surnameError').style.display = 'block';
+                if (isValid) document.getElementById('surname').focus();
+                isValid = false;
+            }
+            
+            if (!validateProvince(province)) {
+                document.getElementById('provinceGroup').classList.add('invalid');
+                document.getElementById('provinceError').style.display = 'block';
+                if (isValid) document.getElementById('province').focus();
+                isValid = false;
+            }
+            
+            if (!validateLocation(city)) {
+                document.getElementById('cityGroup').classList.add('invalid');
+                document.getElementById('cityError').style.display = 'block';
+                if (isValid) document.getElementById('city').focus();
+                isValid = false;
+            }
+            
+            if (!validateLocation(area)) {
+                document.getElementById('areaGroup').classList.add('invalid');
+                document.getElementById('areaError').style.display = 'block';
+                if (isValid) document.getElementById('area').focus();
+                isValid = false;
+            }
+            
+            if (!document.getElementById('agreeTerms').checked) {
+                formError.textContent = "You must agree to the Terms & Conditions";
+                formError.style.display = 'block';
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        
+        // Real-time validation
+        document.getElementById('fullName').addEventListener('blur', function() {
+            if (!validateName(this.value)) {
+                document.getElementById('fullNameGroup').classList.add('invalid');
+                document.getElementById('fullNameError').style.display = 'block';
+            } else {
+                document.getElementById('fullNameGroup').classList.remove('invalid');
+                document.getElementById('fullNameError').style.display = 'none';
+            }
+        });
+        
+        // Add similar blur events for other fields
+        document.getElementById('surname').addEventListener('blur', function() {
+            if (!validateName(this.value)) {
+                document.getElementById('surnameGroup').classList.add('invalid');
+                document.getElementById('surnameError').style.display = 'block';
+            } else {
+                document.getElementById('surnameGroup').classList.remove('invalid');
+                document.getElementById('surnameError').style.display = 'none';
+            }
+        });
+        
+        document.getElementById('city').addEventListener('blur', function() {
+            if (!validateLocation(this.value)) {
+                document.getElementById('cityGroup').classList.add('invalid');
+                document.getElementById('cityError').style.display = 'block';
+            } else {
+                document.getElementById('cityGroup').classList.remove('invalid');
+                document.getElementById('cityError').style.display = 'none';
+            }
+        });
+        
+        document.getElementById('area').addEventListener('blur', function() {
+            if (!validateLocation(this.value)) {
+                document.getElementById('areaGroup').classList.add('invalid');
+                document.getElementById('areaError').style.display = 'block';
+            } else {
+                document.getElementById('areaGroup').classList.remove('invalid');
+                document.getElementById('areaError').style.display = 'none';
+            }
+        });
+        
+        document.getElementById('province').addEventListener('change', function() {
+            if (!validateProvince(this.value)) {
+                document.getElementById('provinceGroup').classList.add('invalid');
+                document.getElementById('provinceError').style.display = 'block';
+            } else {
+                document.getElementById('provinceGroup').classList.remove('invalid');
+                document.getElementById('provinceError').style.display = 'none';
+            }
+        });
+        
+        // Modified form submission
+        advertiserForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            formError.style.display = 'none';
+            
+            if (validateForm()) {
+                // Prepare and send WhatsApp message
+                const fullName = document.getElementById('fullName').value;
+                const surname = document.getElementById('surname').value;
+                const province = document.getElementById('province').value;
+                const city = document.getElementById('city').value;
+                const area = document.getElementById('area').value;
+                
+                const message = `New Advertiser Registration:\n\n` +
+                               `Name: ${fullName} ${surname}\n` +
+                               `Location: ${area}, ${city}, ${province}\n\n` +
+                               `Please process this registration.`;
+                
+                const encodedMessage = encodeURIComponent(message);
+                const whatsappUrl = `https://wa.me/yourbusinessphonenumber?text=${encodedMessage}`;
+                
+                window.open(whatsappUrl, '_blank');
+            }
+        });
+    </script>
+</body>
+</html>
